@@ -1,0 +1,17 @@
+/vendor
+/node_modules
+/.env
+/.git
+/.github
+/storage/logs
+/storage/framework
+/tests
+/.gitignore
+/.dockerignore
+Dockerfile
+docker-compose.yml
+README.md
+.gitlab-ci.yml
+phpunit.xml
+*.log
+.env.example
