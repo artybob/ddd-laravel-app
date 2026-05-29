@@ -26,7 +26,7 @@ class OrderRepository implements OrderRepositoryInterface
             return null;
         }
         
-        return new Order($id, $model->total);
+        return new Order($id, (int) $model->total);
     }
     
     public function exists(OrderId $id): bool

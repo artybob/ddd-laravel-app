@@ -9,10 +9,8 @@ use Illuminate\Routing\Controller;
 
 class OrderController extends Controller
 {
-    public function store(
-        Request $request,
-        CreateOrderHandler $handler
-    ) {
+    public function store(Request $request, CreateOrderHandler $handler)
+    {
         $request->validate([
             'order_id' => 'required|string|regex:/^ORD-\d{5}$/',
             'total' => 'required|integer|min:1'

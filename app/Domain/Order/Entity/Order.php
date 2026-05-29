@@ -42,4 +42,12 @@ class Order
     {
         return $this->createdAt;
     }
+    
+    public function applyDiscount(int $percent): void
+    {
+        if ($percent < 0 || $percent > 100) {
+            throw new \DomainException('Discount must be between 0 and 100');
+        }
+        $this->total = (int)($this->total * (1 - $percent / 100));
+    }
 }
