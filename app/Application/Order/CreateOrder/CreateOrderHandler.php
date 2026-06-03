@@ -12,15 +12,15 @@ class CreateOrderHandler
         private OrderRepositoryInterface $repository,
         private OrderCreationStrategy $strategy
     ) {}
-    
+
     public function execute(CreateOrderCommand $command): void
     {
         $orderId = new OrderId($command->orderId);
-        
+
         if ($this->repository->exists($orderId)) {
             throw new \DomainException('Order already exists');
         }
-        
+
         $order = $this->strategy->create($orderId, $command->total);
         $this->repository->save($order);
     }

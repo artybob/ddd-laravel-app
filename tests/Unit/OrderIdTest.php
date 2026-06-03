@@ -12,7 +12,7 @@ class OrderIdTest extends TestCase
         $orderId = new OrderId('ORD-00001');
         $this->assertEquals('ORD-00001', $orderId->value());
     }
-    
+
     public function test_invalid_order_id_throws_exception()
     {
         $this->expectException(\InvalidArgumentException::class);

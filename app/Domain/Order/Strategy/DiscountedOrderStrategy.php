@@ -8,7 +8,7 @@ use App\Domain\Order\ValueObject\OrderId;
 class DiscountedOrderStrategy implements OrderCreationStrategy
 {
     private int $discountPercent;
-    
+
     public function __construct(int $discountPercent)
     {
         if ($discountPercent < 0 || $discountPercent > 100) {
@@ -16,11 +16,12 @@ class DiscountedOrderStrategy implements OrderCreationStrategy
         }
         $this->discountPercent = $discountPercent;
     }
-    
+
     public function create(OrderId $id, int $total): Order
     {
         $order = new Order($id, $total);
         $order->applyDiscount($this->discountPercent);
+
         return $order;
     }
 }

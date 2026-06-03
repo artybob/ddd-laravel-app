@@ -18,17 +18,17 @@ class OrderRepository implements OrderRepositoryInterface
             ]
         );
     }
-    
+
     public function findById(OrderId $id): ?Order
     {
         $model = OrderModel::find($id->value());
-        if (!$model) {
+        if (! $model) {
             return null;
         }
-        
+
         return new Order($id, (int) $model->total);
     }
-    
+
     public function exists(OrderId $id): bool
     {
         return OrderModel::where('id', $id->value())->exists();
