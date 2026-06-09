@@ -3,16 +3,16 @@
 namespace App\Domain\Order\Entity;
 
 use App\Domain\Order\ValueObject\OrderId;
+use App\Domain\Order\ValueObject\PromoCode;
 
 class Order
 {
     private OrderId $id;
-
-    private int $total;
-
+    private int $originalTotal;      // ← исходная сумма
+    private int $finalTotal;          // ← сумма со скидкой (кэш)
     private string $status;
-
     private \DateTimeImmutable $createdAt;
+    private ?PromoCode $promoCode;    // ← может быть null
 
     public function __construct(OrderId $id, int $total)
     {
@@ -21,19 +21,63 @@ class Order
         }
 
         $this->id = $id;
-        $this->total = $total;
+        $this->originalTotal = $total;
+        $this->finalTotal = $total;   // пока без скидки
         $this->status = 'pending';
-        $this->createdAt = new \DateTimeImmutable;
+        $this->createdAt = new \DateTimeImmutable();
+        $this->promoCode = null;
     }
 
+    public function applyPromoCode(PromoCode $promoCode): void
+    {
+        if ($this->status !== 'pending') {
+            throw new \DomainException('Cannot apply promo code to non-pending order');
+        }
+
+        $this->promoCode = $promoCode;
+        $this->recalculateFinalTotal();
+    }
+
+    private function recalculateFinalTotal(): void
+    {
+        $discount = $this->promoCode?->getDiscountPercent() ?? 0;
+        $this->finalTotal = (int)($this->originalTotal * (1 - $discount / 100));
+    }
+    public function getTotal(): int
+    {
+        return $this->finalTotal; // или $this->originalTotal
+    }
+
+    public function pay(): void
+    {
+        if ($this->status !== 'pending') {
+            throw new \DomainException('Order already paid');
+        }
+        $this->status = 'paid';
+    }
+
+    public function cancel(): void
+    {
+        if ($this->status === 'paid') {
+            throw new \DomainException('Cannot cancel paid order');
+        }
+        $this->status = 'cancelled';
+    }
+
+    // Геттеры
     public function getId(): OrderId
     {
         return $this->id;
     }
 
-    public function getTotal(): int
+    public function getOriginalTotal(): int
     {
-        return $this->total;
+        return $this->originalTotal;
+    }
+
+    public function getFinalTotal(): int
+    {
+        return $this->finalTotal;
     }
 
     public function getStatus(): string
@@ -41,16 +85,8 @@ class Order
         return $this->status;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getPromoCode(): ?PromoCode
     {
-        return $this->createdAt;
-    }
-
-    public function applyDiscount(int $percent): void
-    {
-        if ($percent < 0 || $percent > 100) {
-            throw new \DomainException('Discount must be between 0 and 100');
-        }
-        $this->total = (int) ($this->total * (1 - $percent / 100));
+        return $this->promoCode;
     }
 }
